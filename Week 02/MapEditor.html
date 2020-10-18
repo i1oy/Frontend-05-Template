@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Map Editor</title>
+        <style>
+            div {
+                padding: 0px;
+            }
+            .cell {
+                display: inline-block;
+                width: 7px;
+                height: 7px;
+                background-color: gray;
+                border-bottom: solid 1px white;
+                border-right: solid 1px white;
+                vertical-align: bottom;
+            }
+
+            #container {
+                display: inline-block;
+                line-height: 7px;
+                /* width: 701px; */
+
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            #coord {
+                display: inline-block;
+                vertical-align: top;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container"></div>
+        <div id="coord"></div>
+        <br />
+        <button onclick="localStorage['map'] = JSON.stringify(map);">
+            SAVE
+        </button>
+        <script>
+            class Sorted {
+                constructor(data, compare) {
+                    this.data = data;
+                    this.compare = compare || ((a, b) => a - b);
+                }
+
+                getLength() {
+                    return this.data.length;
+                }
+
+                take() {
+                    // debugger;
+                    let len = this.data.length;
+                    if (!len) {
+                        return;
+                    }
+
+                    let minIndex = 0;
+                    let min = this.data[minIndex];
+
+                    for (let i = 1; i < len; ++i) {
+                        if (this.compare(this.data[i], min) < 0) {
+                            minIndex = i;
+                            min = this.data[i];
+                        }
+                    }
+
+                    this.data[minIndex] = this.data[len - 1];
+                    this.data.pop();
+                    return min;
+                }
+
+                give(val) {
+                    this.data.push(val);
+                }
+            }
+            let TOTAL_CELLS = 10000;
+            let ROW = 100,
+                COL = 100;
+            let container = document.getElementById("container");
+            let coord = document.getElementById("coord");
+            container.innerText = "";
+            let mousedown = false;
+            let clear = false;
+
+            let map = localStorage["map"]
+                ? JSON.parse(localStorage["map"])
+                : Array(TOTAL_CELLS).fill(0);
+            let draw = function (map) {
+                for (let i = 0; i < ROW; ++i) {
+                    for (let j = 0; j < COL; ++j) {
+                        let cell = document.createElement("div");
+                        cell.classList.add("cell");
+                        if (map[ROW * i + j] == 1) {
+                            cell.style.backgroundColor = "black";
+                        } else if (map[ROW * i + j] == 2) {
+                            // cell.style.backgroundColor = "red";
+                        }
+                        cell.addEventListener("mousemove", () => {
+                            if (mousedown) {
+                                if (clear) {
+                                    cell.style.backgroundColor = "";
+                                    map[ROW * i + j] = 0;
+                                } else {
+                                    cell.style.backgroundColor = "black";
+                                    map[ROW * i + j] = 1;
+                                }
+                            }
+                            // requestAnimationFrame(() => {
+                            //     coord.innerText = "x:" + i + " y:" + j;
+                            // });
+                        });
+                        container.appendChild(cell);
+                    }
+                    container.appendChild(document.createElement("br"));
+                }
+            };
+
+            document.addEventListener("mousedown", e => {
+                mousedown = true;
+                clear = e.which === 3;
+            });
+
+            document.addEventListener("mouseup", e => {
+                mousedown = false;
+            });
+
+            document.addEventListener("contextmenu", e => {
+                e.preventDefault();
+            });
+
+            async function findPath(map, start, end) {
+                // let queue = [start];
+                function distance(point) {
+                    let dis =
+                        Math.abs(point[0] - end[0]) +
+                        Math.abs(point[1] - end[1]);
+                    return dis;
+                }
+                let queue = new Sorted([start], (a, b) => {
+                    return distance(a) - distance(b);
+                });
+                let table = Object.create(map);
+                let ROWS = 100;
+                let COLS = 100;
+
+                let cells = document.querySelectorAll("#container > div.cell");
+                async function insert(x, y, pre) {
+                    if (x < 0 || x >= ROWS || y < 0 || y >= COLS) {
+                        return;
+                    }
+
+                    if (table[x * ROWS + y]) {
+                        return;
+                    }
+
+                    // await sleep(10);
+
+                    cells[x * ROWS + y].style.backgroundColor = "lightgreen";
+                    table[x * ROWS + y] = pre;
+
+                    map[x * ROWS + y] = 2;
+                    queue.give([x, y]);
+                }
+
+                while (queue.getLength()) {
+                    let [x, y] = queue.take();
+                    // console.log(x, y);
+                    // draw(map);
+                    if (x === end[0] && y === end[1]) {
+                        let path = [];
+                        cells[end[0] * ROWS + end[1]].style.backgroundColor =
+                            "red";
+                        while (x !== start[0] || y !== start[1]) {
+                            path.push(map[x * ROWS + y]);
+                            [x, y] = table[x * ROWS + y];
+
+                            cells[x * ROWS + y].style.backgroundColor =
+                                "purple";
+                        }
+                        return path;
+                    }
+
+                    await insert(x, y + 1, [x, y]);
+                    await insert(x + 1, y, [x, y]);
+                    await insert(x, y - 1, [x, y]);
+                    await insert(x - 1, y, [x, y]);
+
+                    await insert(x + 1, y + 1, [x, y]);
+                    await insert(x + 1, y - 1, [x, y]);
+                    await insert(x - 1, y - 1, [x, y]);
+                    await insert(x - 1, y + 1, [x, y]);
+                }
+
+                return null;
+            }
+
+            let sleep = function (t) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(resolve, t);
+                });
+            };
+
+            draw(map);
+        </script>
+    </body>
+</html>
