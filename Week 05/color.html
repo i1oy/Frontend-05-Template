@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>COLOR</title>
+    </head>
+    <body>
+        <div>
+            <input type="range" name="red" id="red" min="0" max="255" />
+            <input type="range" name="green" id="green" min="0" max="255" />
+            <input type="range" name="blue" id="blue" min="0" max="255" />
+        </div>
+        <div
+            id="color"
+            style="height: 100px; width: 100px; border: 1px solid grey"
+        ></div>
+
+        <script>
+            let callbacks = new Map();
+            let reactivities = new Map();
+
+            let obj = {
+                red: 0,
+                green: 0,
+                blue: 0
+            };
+
+            let usedReactivities = [];
+            // let po = new Proxy(obj, {
+            //     set(obj, prop, val) {}
+            // });
+
+            let po = reactive(obj);
+
+            effect(() => {
+                document.getElementById("red").value = po.red;
+            });
+
+            effect(() => {
+                document.getElementById("green").value = po.green;
+            });
+
+            effect(() => {
+                document.getElementById("blue").value = po.blue;
+            });
+
+            effect(() => {
+                document.getElementById(
+                    "color"
+                ).style.backgroundColor = `rgb(${po.red}, ${po.green}, ${po.blue})`;
+            });
+
+            for (let c of ["red", "green", "blue"]) {
+                document.getElementById(c).addEventListener("input", event => {
+                    po[c] = event.target.value;
+                });
+            }
+
+            function effect(callback) {
+                // callbacks.push(callback);
+                usedReactivities = [];
+                callback();
+                console.log(usedReactivities);
+
+                for (let reactivity of usedReactivities) {
+                    if (!callbacks.has(reactivity[0])) {
+                        callbacks.set(reactivity[0], new Map());
+                    }
+                    if (!callbacks.get(reactivity[0]).has(reactivity[1])) {
+                        callbacks.get(reactivity[0]).set(reactivity[1], []);
+                    }
+
+                    callbacks
+                        .get(reactivity[0])
+                        .get(reactivity[1])
+                        .push(callback);
+                }
+            }
+
+            function reactive(object) {
+                if (reactivities.has(object)) {
+                    return reactivities.get(object);
+                }
+
+                return new Proxy(obj, {
+                    set(obj, prop, val) {
+                        obj[prop] = val;
+                        if (
+                            callbacks.get(obj) &&
+                            callbacks.get(obj).get(prop)
+                        ) {
+                            for (let callback of callbacks.get(obj).get(prop)) {
+                                callback();
+                            }
+                        }
+                        // console.log(obj, prop, val);
+                        // for (let callback of callbacks) {
+                        //     callback();
+                        // }
+                        return obj[prop];
+                    },
+                    get(obj, prop) {
+                        // console.log(obj, prop);
+                        usedReactivities.push([obj, prop]);
+
+                        if (typeof obj[prop] === "object") {
+                            return reactive(obj[prop]);
+                        }
+
+                        return obj[prop];
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>
