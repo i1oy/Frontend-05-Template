@@ -65,3 +65,54 @@ JavaScript 总体上属于上下文无关文法，表达式部分大体是正则
 
 命令式语言：
     `C, C++, C#, Java, JavaScript, Python, Ruby, Perl, T-SQL, Go, Scale, Swift, Objective-C, PHP, R, VB`
+
+## 编程语言的性质
+
+### 图灵完备性
+
+所有可计算的问题都可用来描述的语言就是具有图灵完备性。
+
+- 命令式——图灵机
+    - goto
+    - if 和 while
+- 声明式——lambda
+    - 递归
+
+### 动态与静态
+
+动态：
+    在用户的设备/在线服务器上；
+    产品实际运行时；
+    Runtime
+
+静态：
+    在程序员的设备上；
+    产品开发时；
+    Compiletime
+
+## 类型系统
+
+- 动态类型系统与静态类型系统；
+    `JavaScript`:动态；`C/C++`:静态；`Java`:半动态半静态；
+    Java能够通过反射机制去获取运行时的类型信息。
+- 强类型与弱类型；
+    强类型语言：类型转换不会默认发生；
+    JavaScript 是典型的弱类型语言；
+    在JS中String与Boolean做`==`运算时Boolean会先被转化成数字。
+- 复合类型
+    结构体；
+    函数签名
+- 子类型
+- 泛型
+    逆变/协变
+
+## 一般命令式语言的设计方法
+
+1. Atom(原子级): 语言的最小单位，例如Identifier, Literal
+2. Expression(表达式): Atom, Operator, Punctuator(标点符号)
+3. Statement(语句): Expression, Keyword, Punctuator
+4. Structure(结构)
+    Function, Class, Process(过程), Namespace, ...
+5. Program: Program, Module, Package, Library
+    更好地管理语言的模块；在JS中由npm负责；JS的顶级概念：Program, Module
+
