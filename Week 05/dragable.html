@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dragable</title>
+    </head>
+    <body>
+        <div
+            id="container"
+            style="cursor: default; font-size: x-large; color: #1f2020"
+        >
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus
+            ipsum, modi cupiditate ipsam harum perspiciatis unde. Ipsam placeat
+            labore omnis nisi, quasi corporis assumenda nostrum sapiente eos,
+            non repudiandae odit. Lorem ipsum dolor sit amet consectetur
+            adipisicing elit. Sunt culpa asperiores architecto consectetur
+            perferendis officiis ipsam, debitis obcaecati necessitatibus
+            excepturi inventore natus enim voluptatum, vero officia hic. Fugit,
+            ratione exercitationem? Lorem ipsum dolor, sit amet consectetur
+            adipisicing elit. Maxime, culpa iste, ipsa soluta magni, quas veniam
+            quasi cumque saepe ullam enim itaque totam labore repellat. Alias
+            aspernatur similique modi ipsa. Lorem ipsum dolor sit amet
+            consectetur adipisicing elit. Quaerat accusamus nesciunt incidunt
+            inventore assumenda laudantium, debitis asperiores sequi
+            necessitatibus nostrum doloribus sit id nobis suscipit? Saepe
+            dignissimos laudantium ut ad.
+        </div>
+        <div
+            id="dragable"
+            style="
+                display: inline-block;
+                height: 128px;
+                width: 128px;
+                background-color: #aee1cd;
+            "
+        ></div>
+        <script>
+            let ranges = [];
+            let dragable = document.getElementById("dragable");
+            let baseX = dragable.getBoundingClientRect().x;
+            let baseY = dragable.getBoundingClientRect().y;
+            dragable.addEventListener("mousedown", () => {
+                let mouseUp = () => {
+                    document.removeEventListener("mouseup", mouseUp);
+                    document.removeEventListener("mousemove", mouseMove);
+                };
+
+                document.addEventListener("mouseup", mouseUp);
+
+                let mouseMove = event => {
+                    // console.log(event.clientX, event.clientY);
+                    requestAnimationFrame(() => {
+                        let x = event.clientX;
+                        let y = event.clientY;
+                        let nearest = Infinity;
+                        let nearestRange = null;
+                        ranges.forEach(element => {
+                            // debugger;
+                            let rect = element.getBoundingClientRect();
+                            let distance =
+                                (x - rect.x) ** 2 + (y - rect.y) ** 2;
+                            if (distance < nearest) {
+                                nearest = distance;
+                                nearestRange = element;
+                            }
+                        });
+                        nearestRange.insertNode(dragable);
+                        // dragable.style.transform = `translate(${
+                        //     event.clientX - baseX
+                        // }px, ${event.clientY - baseY}px)`;
+                    });
+                };
+
+                document.addEventListener("mousemove", mouseMove);
+            });
+
+            document.addEventListener("selectstart", event =>
+                event.preventDefault()
+            );
+
+            let container = document.getElementById("container");
+            for (
+                let i = 0;
+                i < container.childNodes[0].textContent.length;
+                ++i
+            ) {
+                let range = document.createRange();
+                range.setStart(container.childNodes[0], i);
+                range.setEnd(container.childNodes[0], i);
+                // debugger;
+                ranges.push(range);
+            }
+        </script>
+    </body>
+</html>
