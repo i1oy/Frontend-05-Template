@@ -51,4 +51,9 @@ while (input) {
 在 Node 中 TCP/UDP 对应 `require("net")`；
 HTTP 对应 `require("http")`。
 
+## 实现 HTTP 请求
 
+- 设计一个HTTP请求的类；
+- `Content-Type`是一个必要的字段；
+- body是`key-value`格式；
+- 不同的`Content-Type`影响body的格式
