@@ -20,6 +20,44 @@ Margin Collapse 只会发生正常流的 BFC 里。
 - Block Box = Block Container + Block-level Box:
     里外都有BFC
 
+### Block Container
+
+- block
+- inline-block
+- table-cell
+- flex item
+- grid cell
+- table-caption
+
+### Block-level Box
+
+Block Level
+
+- display: block
+- display: flex
+- display: table
+- display: grid
+...
+
+Inline Level
+
+- display: inline-block
+- display: inline-flex
+- display: inline-table
+- display: inline-grid
+...
+
+### 创建BFC的情况
+
+- floats: 浮动元素
+- absolutely positioned elements: 绝对定位元素
+- block containers (such as inline-block, table-cells, and table-captions) that are not block boxes,
+    - flex items
+    - grid cell
+    - ...
+- and block boxes with 'overflow' other than 'visible': 除了overflow属性为visible的block boxes
+
+
 ## Flex排版
 
 1. 收集盒进行；
@@ -43,3 +81,15 @@ Margin Collapse 只会发生正常流的 BFC 里。
 
 - `@keyframes`定义关键帧
 - `animation`使用动画
+
+## 绘制
+
+- 几何图形
+    - border
+    - box-shadow
+    - border-radiua
+- 文字
+    - font
+    - text-decoration
+- 位图
+    - backgroud-image
