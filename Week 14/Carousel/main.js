@@ -11,22 +11,32 @@ class Carousel extends Component {
         for (let pic of this.attributes["src"]) {
             let child = document.createElement("div");
             child.style.backgroundImage = `url("${pic}")`;
-            // child.style.display = "none";
             this.root.appendChild(child);
         }
 
-        let currentIndex = 0;
+        this.root.addEventListener("mousedown", () => {
+            console.log("mousedown");
+
+            let move = e => {
+                console.log("move");
+            };
+            let up = e => {
+                console.log("up");
+                document.removeEventListener("mousemove", move);
+                document.removeEventListener("mouseup", up);
+            };
+            document.addEventListener("mousemove", move);
+            document.addEventListener("mouseup", up);
+        });
+        /* let currentIndex = 0;
         setInterval(() => {
             let children = this.root.children;
             let length = children.length;
             let nextIndex = (currentIndex + 1) % length;
-
             let current = children[currentIndex];
             let next = children[nextIndex];
-
             next.style.transition = "none";
             next.style.transform = `translateX(${100 - nextIndex * 100}%)`;
-
             setTimeout(() => {
                 next.style.transition = "";
                 current.style.transform = `translateX(${
@@ -35,11 +45,7 @@ class Carousel extends Component {
                 next.style.transform = `translateX(${-nextIndex * 100}%)`;
                 currentIndex = nextIndex;
             }, 16);
-
-            // for (let child of children) {
-            //     child.style.transform = `translateX(-${100 * current}%)`;
-            // }
-        }, 1000);
+        }, 3000); */
         return this.root;
     }
     setAttribute(name, val) {
