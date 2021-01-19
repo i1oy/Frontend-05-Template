@@ -14,14 +14,28 @@ class Carousel extends Component {
             this.root.appendChild(child);
         }
 
-        this.root.addEventListener("mousedown", () => {
-            console.log("mousedown");
+        let pos = 0;
+        let width = 500;
+        this.root.addEventListener("mousedown", event => {
+            // console.log("mousedown");
+            let children = this.root.children;
+            let startX = event.clientX;
 
             let move = e => {
-                console.log("move");
+                let x = e.clientX - startX;
+                for (let child of children) {
+                    child.style.transition = "none";
+                    child.style.transform = `translateX(${-pos * 500 + x}px)`;
+                }
             };
             let up = e => {
-                console.log("up");
+                let x = e.clientX - startX;
+                pos = pos - Math.round((x - 200) / 500);
+                for (let child of children) {
+                    child.style.transition = "";
+                    child.style.transform = `translateX(${-pos * 500}px)`;
+                }
+
                 document.removeEventListener("mousemove", move);
                 document.removeEventListener("mouseup", up);
             };
