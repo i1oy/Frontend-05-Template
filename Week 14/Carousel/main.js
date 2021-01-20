@@ -17,24 +17,49 @@ class Carousel extends Component {
         let pos = 0;
         let width = 500;
         this.root.addEventListener("mousedown", event => {
-            // console.log("mousedown");
             let children = this.root.children;
             let startX = event.clientX;
 
             let move = e => {
                 let x = e.clientX - startX;
-                for (let child of children) {
+
+                let current = pos - (x - (x % width)) / width;
+
+                for (let offset of [-2, -1, 0, 1, 2]) {
+                    let position = current + offset;
+                    position = (position + children.length) % children.length;
+                    let child = children[position];
                     child.style.transition = "none";
-                    child.style.transform = `translateX(${-pos * 500 + x}px)`;
+                    child.style.transform = `translateX(${
+                        -position * width + offset * width + (x % width)
+                    }px)`;
                 }
+                // for (let child of children) {
+                //     child.style.transition = "none";
+                //     child.style.transform = `translateX(${-pos * 500 + x}px)`;
+                // }
             };
             let up = e => {
                 let x = e.clientX - startX;
-                pos = pos - Math.round((x - 200) / 500);
-                for (let child of children) {
+                pos = pos - Math.round(x / width);
+                for (let offset of [
+                    0,
+                    -Math.sign(
+                        Math.round(x / width) - x + (width >> 1) * Math.sign(x)
+                    )
+                ]) {
+                    let position = pos + offset;
+                    position = (position + children.length) % children.length;
+                    let child = children[position];
                     child.style.transition = "";
-                    child.style.transform = `translateX(${-pos * 500}px)`;
+                    child.style.transform = `translateX(${
+                        (offset - position) * width
+                    }px)`;
                 }
+                // for (let child of children) {
+                //     child.style.transition = "";
+                //     child.style.transform = `translateX(${-pos * 500}px)`;
+                // }
 
                 document.removeEventListener("mousemove", move);
                 document.removeEventListener("mouseup", up);
