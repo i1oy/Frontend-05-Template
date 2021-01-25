@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Carousel</title>
+        <style>
+            div.block {
+                height: 100px;
+                width: 100px;
+                background-color: lightskyblue;
+            }
+            div.controller > button {
+                background-color: lightsteelblue;
+                color: white;
+                border-radius: 3px;
+                border: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="el" class="block"></div>
+        <div class="controller">
+            <button id="btn_pause">PAUSE</button>
+            <button id="btn_resume">RESUME</button>
+        </div>
+        <script type="module" src="./animation_demo.js"></script>
+    </body>
+</html>
