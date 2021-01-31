@@ -1,0 +1,114 @@
+import { linear } from "./ease.js";
+
+const TICK = Symbol("tick");
+const TICK_HANDLER = Symbol("tick-handler");
+const ANIMATIONS = Symbol("animations");
+const START_TIME = Symbol("start-time");
+const PAUSE_START = Symbol("pause-start");
+const PAUSE_TIME = Symbol("pause-time");
+const STATE = Symbol("state");
+
+const INITED = "inited";
+const STARTED = "started";
+const PAUSED = "paused";
+
+export class Timeline {
+    constructor() {
+        this[STATE] = INITED;
+        this[START_TIME] = new Map();
+        this[ANIMATIONS] = new Set();
+    }
+
+    start() {
+        if (this[STATE] !== INITED) return;
+        this[STATE] = STARTED;
+        let startTime = Date.now();
+        this[PAUSE_TIME] = 0;
+
+        this[TICK] = () => {
+            let now = Date.now();
+            for (let animation of this[ANIMATIONS]) {
+                let t;
+                if (this[START_TIME].get(animation) < startTime) {
+                    t = now - startTime;
+                } else {
+                    t = now - this[START_TIME].get(animation);
+                }
+
+                t = t - this[PAUSE_TIME];
+                t = t - animation.delay;
+                if (animation.duration < t) {
+                    this[ANIMATIONS].delete(animation);
+                    t = animation.duration;
+                }
+                if (t > 0) animation.receiveTime(t);
+            }
+
+            this[TICK_HANDLER] = requestAnimationFrame(this[TICK]);
+        };
+        this[TICK]();
+    }
+
+    pause() {
+        if (this[STATE] !== STARTED) return;
+        this[STATE] = PAUSED;
+        this[PAUSE_START] = Date.now();
+        cancelAnimationFrame(this[TICK_HANDLER]);
+    }
+    resume() {
+        if (this[STATE] !== PAUSED) return;
+        this[STATE] = STARTED;
+        this[PAUSE_TIME] += Date.now() - this[PAUSE_START];
+        this[TICK]();
+    }
+
+    reset() {
+        this.pause();
+        this[PAUSE_TIME] = 0;
+        this[PAUSE_START] = 0;
+        this[TICK_HANDLER] = null;
+        this[ANIMATIONS] = new Set();
+        this[START_TIME] = new Map();
+        this[STATE] = INITED;
+    }
+
+    add(animation, startTime) {
+        if (arguments.length < 2) startTime = Date.now();
+        this[ANIMATIONS].add(animation);
+        this[START_TIME].set(animation, startTime);
+    }
+}
+
+/**
+ * 属性动画
+ */
+export class Animation {
+    constructor(
+        object,
+        property,
+        startValue,
+        endValue,
+        duration,
+        delay,
+        timingFunction,
+        template
+    ) {
+        this.object = object;
+        this.property = property;
+        this.startValue = startValue;
+        this.endValue = endValue;
+        this.duration = duration;
+        this.delay = delay;
+        this.timingFunction = timingFunction || linear;
+        this.template = template;
+    }
+
+    receiveTime(time) {
+        // console.log(time);
+        let range = this.endValue - this.startValue;
+        let progress = this.timingFunction(time / this.duration);
+        this.object[this.property] = this.template(
+            this.startValue + range * progress
+        );
+    }
+}
