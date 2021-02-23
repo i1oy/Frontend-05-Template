@@ -31,10 +31,15 @@ TIPS:
 
 ## 4. 实现一个发布系统 ｜ 使用 node 启动一个简单的 Server
 
-使用 `http.createServer` 创建一个简单服务器
+使用 `http.createServer` 创建一个简单服务器。
 
 ## 5. 实现一个发布系统 ｜ 编写简单的发送请求的功能
 
-使用 `http.request` 发起请求
+使用 `http.request` 发起请求。
 
 ## 6. 实现一个发布系统 ｜ 简单了解 Node.js 的流
+
+[Node.js的流式传输](https://nodejs.org/docs/latest-v13.x/api/stream.html#stream_class_stream_readable)
+
+流式传输需要使用 POST 方法， 同时在请求的 headers 参数中添加
+`'Content-Type': 'application/octet-stream'`
