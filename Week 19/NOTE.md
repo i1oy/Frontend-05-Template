@@ -43,3 +43,13 @@ TIPS:
 
 流式传输需要使用 POST 方法， 同时在请求的 headers 参数中添加
 `'Content-Type': 'application/octet-stream'`
+
+## 7. 实现一个发布系统 ｜ 改造 server
+
+在服务端创建写入流(`createWriteStream`), 将本地文件传输到服务端。
+
+## 8. 实现一个发布系统 ｜ 实现多文件发布
+
+使用 Node.js 中的压缩包: `Archiver`, `unzipper`;
+
+使用 Stream 的 `pipe` 方法，将一个可读的流导入到可写的流中。

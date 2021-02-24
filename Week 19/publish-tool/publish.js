@@ -18,7 +18,7 @@ let request = http.request(
 // 结束发送请求
 // request.end();
 
-let file = fs.createReadStream("./package.json");
+let file = fs.createReadStream("./sample.html");
 
 file.on("data", chunk => {
     // console.log(chunk.toString());
