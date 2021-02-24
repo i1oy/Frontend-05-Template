@@ -53,3 +53,5 @@ TIPS:
 使用 Node.js 中的压缩包: `Archiver`, `unzipper`;
 
 使用 Stream 的 `pipe` 方法，将一个可读的流导入到可写的流中。
+
+利用压缩、解压实现多文件传输；利用`pipe`方法简化传输代码
