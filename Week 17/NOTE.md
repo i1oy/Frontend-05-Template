@@ -14,3 +14,9 @@
 安装webpack: `webpack-cli`, `webpack`;
 
 webpack的核心: `loader`;
+
+### Babel
+
+```sh
+npm install @babel/core @babel/cli
+```
