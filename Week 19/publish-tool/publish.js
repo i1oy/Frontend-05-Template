@@ -1,68 +1,80 @@
 let http = require("http");
-let fs = require("fs");
 
-let request = http.request(
-    {
-        hostname: "localhost",
-        port: 8082,
-        method: "POST",
-        headers: {
-            "Content-Type": "application/octet-stream"
-            // 添加Content-Length
-            // "Content-Length": stats.size
-        }
-    },
-    response => {
-        console.log(response);
-    }
+const querystring = require("querystring");
+let archiver = require("archiver");
+
+let child_proc = require("child_process");
+
+const client_id = "Iv1.f7ff347e40501587";
+
+// 1. 打开 https://github.com/login/oauth/authorize
+child_proc.exec(
+    `open -a "Google Chrome" https://github.com/login/oauth/authorize?client_id=${client_id}`
+    // `open https://github.com/login/oauth/authorize?client_id=${client_id}`
 );
 
-let archiver = require("archiver");
-const archive = archiver("zip", {
-    zlib: { level: 9 }
-});
+// 3. 创建 server，接受 token，后点击发布
+http.createServer((req, res) => {
+    let matchRes = req.url.match(/^\/\?([\s\S]+)$/);
+    if (matchRes && matchRes.length > 1) {
+        let query = querystring.parse(matchRes[1]);
+        pulish(query.token, req, res);
+    }
 
-archive.directory("./static/", false);
+    // res.end();
+}).listen(8083);
 
-archive.finalize();
+const pulish = (token, request, response) => {
+    let req = http.request(
+        {
+            hostname: "localhost",
+            port: 8082,
+            method: "POST",
+            connection: "keep-alive",
+            path: `/publish?token=${token}`,
+            headers: {
+                "Conten-Type": "application/octet-stream"
+            }
+        },
+        res => {
+            let bodyStr = "";
+            res.on("data", chunk => {
+                bodyStr += chunk.toString();
+            });
+            res.on("end", () => {
+                response.end("SUCCESS!" + bodyStr);
+            });
+        }
+    );
 
-archive.pipe(request);
+    req.on("error", err => {
+        console.log(err.message);
+    });
 
-// archive.pipe(fs.createWriteStream("./tmpo.zip"));
+    req.on("pipe", () => {
+        console.log("Pipe");
+    });
 
-// fs.stat("./sample.html", (err, stats) => {
-//     let request = http.request(
-//         {
-//             hostname: "localhost",
-//             port: 8082,
-//             method: "POST",
-//             headers: {
-//                 "Content-Type": "application/octet-stream",
-//                 // 添加Content-Length
-//                 "Content-Length": stats.size
-//             }
-//         },
-//         response => {
-//             console.log(response);
-//         }
-//     );
+    req.on("close", () => {
+        console.log("CLOSE");
+    });
 
-//     // 结束发送请求
-//     // request.end();
+    req.on("drain", () => {
+        console.log("DRAIN");
+    });
 
-//     let file = fs.createReadStream("./sample.html");
+    req.on("finish", () => {
+        console.log("FINISH");
+    });
 
-//     file.pipe(request);
+    const archive = archiver("zip", {
+        zlib: { level: 9 }
+    });
 
-//     file.on("end", () => request.end());
-// });
+    archive.directory("./static/", false);
 
-// file.on("data", chunk => {
-//     // console.log(chunk.toString());
-//     request.write(chunk);
-// });
+    archive.finalize();
 
-// file.on("close", chunk => {
-//     console.log("read finished");
-//     request.end(chunk);
-// });
+    console.log("PIPE~");
+    archive.pipe(req);
+};
