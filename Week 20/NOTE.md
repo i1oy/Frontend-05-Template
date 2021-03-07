@@ -11,6 +11,12 @@
 
 ## 持续集成 ｜ ESLint 的基本用法
 
+安装: `npm i -D eslint`;
+
+配置: `npx eslint --init`;
+
+使用: `npx eslint index.js`;
+
 ## 持续集成 ｜ ESLint API 及高级用法
 
 ## 持续集成 ｜ 使用无头浏览器检查 DOM
