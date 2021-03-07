@@ -2,4 +2,6 @@
 .vscode
 dist
 
+client_secret.js
+
 node_modules
