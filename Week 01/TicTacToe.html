@@ -68,14 +68,35 @@
             if (val == 1 || val == 2) return;
             pattern[x * 3 + y] = color;
 
-            if (check(pattern, color)) {
-                alert((color == 2 ? "❌" : "⭕️") + " is winner!");
+            show();
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    if (check(pattern, color)) {
+                        alert((color == 2 ? "❌" : "⭕️") + " is winner!");
+                    }
+                    color = 3 - color;
+                    computerMove();
+                });
+            });
+        }
+
+        function computerMove() {
+            let choice = bestChoice(pattern, color);
+            if (choice.point) {
+                let p = choice.point;
+                pattern[p[0] * 3 + p[1]] = color;
             }
 
-            color = 3 - color;
             show();
-            computerMove();
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    if (check(pattern, color)) {
+                        alert((color == 2 ? "❌" : "⭕️") + " is winner!");
+                    }
+                    color = 3 - color;
+                });
 
+            });
         }
 
         function check(pattern, color) {
@@ -143,19 +164,6 @@
                 }
             }
             return null;
-        }
-
-        function computerMove() {
-            let choice = bestChoice(pattern, color);
-            if (choice.point) {
-                let p = choice.point;
-                pattern[p[0] * 3 + p[1]] = color;
-            }
-            if (check(pattern, color)) {
-                alert((color == 2 ? "❌" : "⭕️") + " is winner!");
-            }
-            color = 3 - color;
-            show();
         }
 
         function bestChoice(pattern, color) {
