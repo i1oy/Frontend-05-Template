@@ -41,6 +41,8 @@
     <script>
         let pattern = [0, 0, 0, 0, 0, 0, 0, 0, 0];
         let color = 1;
+
+        // 绘制棋盘
         function show() {
             let board = document.getElementById("board");
             board.innerText = "";
@@ -99,6 +101,7 @@
             });
         }
 
+        // 检查胜负情况
         function check(pattern, color) {
             for (let i = 0; i < 3; ++i) {
                 let win = true;
@@ -145,6 +148,7 @@
             }
         }
 
+        // 复制棋盘数据
         function clone(pattern) {
             // 将 pattern 转化为一维数组就可以直接使用 Object.create 方法来复制数据。
             return Object.create(pattern);
